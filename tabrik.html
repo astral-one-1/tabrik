@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c1226">
+<title>Tug‘ilgan kuning muborak 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#1c1226;--bg2:#3a1c3f;--gold:#f2c98a;--rose:#ff9fb2;--ink:#fff7f0;--soft:#d9c6de;
+--serif:'Playfair Display',Georgia,serif;--sans:'Manrope',system-ui,sans-serif;box-sizing:border-box}
+*{box-sizing:inherit;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg1);color:var(--ink);font-family:var(--sans)}
+body{background:radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg1) 70%)}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.page{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+padding:calc(env(safe-area-inset-top,0px) + 28px) 26px calc(env(safe-area-inset-bottom,0px) + 96px);
+opacity:0;visibility:hidden;transform:translateX(40px);transition:opacity .7s,transform .7s,visibility .7s}
+.page.active{opacity:1;visibility:visible;transform:none}
+.page.past{transform:translateX(-40px)}
+.page>*{opacity:0;transform:translateY(22px)}
+.page.active>*{animation:up .9s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i,0)*.22s + .25s)}
+@keyframes up{to{opacity:1;transform:none}}
+.tag{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,10vw,48px);line-height:1.15;margin:14px 0}
+h1 em{color:var(--rose);font-style:italic;font-weight:500}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(28px,8vw,38px);line-height:1.2;margin-bottom:16px}
+p{color:var(--soft);font-size:17px;line-height:1.7;max-width:340px}
+.ring{width:170px;height:170px;border-radius:50%;margin:22px 0;display:grid;place-items:center;position:relative;
+background:conic-gradient(from 0deg,var(--gold),var(--rose),var(--gold));padding:3px;animation:spin 14s linear infinite}
+.ring>div{width:100%;height:100%;border-radius:50%;background:var(--bg1);display:grid;place-items:center;animation:spin 14s linear infinite reverse}
+.ring b{font-family:var(--serif);font-size:78px;font-weight:600;background:linear-gradient(135deg,var(--gold),var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes spin{to{transform:rotate(360deg)}}
+.page.active .ring{animation:up .9s forwards,spin 14s linear infinite}
+.cards{display:grid;gap:12px;width:100%;max-width:340px;margin-top:6px}
+.card{display:flex;gap:14px;align-items:center;text-align:left;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(242,201,138,.22);backdrop-filter:blur(6px)}
+.card span{font-size:28px}
+.card h3{font-size:15px;color:var(--gold);margin-bottom:2px}
+.card p{font-size:14px;line-height:1.45}
+.page.active .card{opacity:0;animation:up .8s forwards;animation-delay:calc(var(--i)*.28s + .5s)}
+.btn{margin-top:28px;border:0;border-radius:999px;padding:15px 34px;font:600 16px var(--sans);color:#2a1330;background:linear-gradient(135deg,var(--gold),var(--rose));box-shadow:0 10px 30px rgba(255,159,178,.3)}
+.btn:active{transform:scale(.96)}
+.cake{width:190px;margin:10px 0 4px;cursor:pointer}
+.flame{transform-origin:95px 62px;animation:flick .5s ease-in-out infinite alternate;transition:opacity .4s}
+.out .flame{opacity:0;animation:none}
+@keyframes flick{from{transform:scale(1,1) rotate(-3deg)}to{transform:scale(.92,1.1) rotate(3deg)}}
+.hint{font-size:13px;color:var(--gold);letter-spacing:.04em}
+.nav{position:fixed;z-index:5;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);display:flex;justify-content:center;align-items:center;gap:18px}
+.dots{display:flex;gap:8px}
+.dots i{width:7px;height:7px;border-radius:9px;background:rgba(255,255,255,.28);transition:.4s}
+.dots i.on{width:24px;background:var(--gold)}
+.arrow{width:46px;height:46px;border-radius:50%;border:1px solid rgba(242,201,138,.4);background:rgba(255,255,255,.06);color:var(--gold);font-size:20px}
+.arrow:disabled{opacity:.25}
+.swipe{position:fixed;z-index:5;top:calc(env(safe-area-inset-top,0px) + 14px);right:18px;font-size:12px;color:var(--soft);opacity:.7}
+.fl{position:absolute;pointer-events:none;z-index:0}
+.fl svg{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+.page.active>.fl{opacity:0;animation:bloom 1.4s cubic-bezier(.2,1.1,.3,1) forwards,sway 7s ease-in-out infinite alternate;animation-delay:calc(var(--d)*1s),calc(var(--d)*1s + 1.4s)}
+@keyframes bloom{from{opacity:0;transform:scale(.2) rotate(-50deg)}to{opacity:1;transform:none}}
+@keyframes sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+@media (max-height:640px){.ring{width:130px;height:130px}.ring b{font-size:58px}.cake{width:150px}}
+@media (prefers-reduced-motion:reduce){.ring,.ring>div,.flame{animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<section class="page active">
+  <div class="tag" style="--i:0">10 · 10 · 2007</div>
+  <h1 style="--i:1">Tug‘ilgan kuning<br><em>muborak</em>, <span id="nm">aziz inson</span>!</h1>
+  <div class="ring" style="--i:2"><div><b id="age">20</b></div></div>
+  <p style="--i:3">Bugun faqat senga atalgan kun. Davom et — senga aytadigan gaplarim bor.</p>
+</section>
+
+<section class="page">
+  <div class="tag" style="--i:0">Bir yosh katta — bir qadam yuqori</div>
+  <h2 style="--i:1">Sen shunday insonsanki…</h2>
+  <p style="--i:2">…yonida bo‘lganlarning kayfiyati ko‘tariladi. Samimiyliging, tabassuming va yaxshi so‘zlaring odamlarga iliqlik beradi. Shu fazilatlaringni hech qachon yo‘qotma.</p>
+  <p style="--i:3;margin-top:14px">Yangi yoshing senga yangi imkoniyatlar, yangi do‘stlar va yangi cho‘qqilar olib kelsin.</p>
+</section>
+
+<section class="page">
+  <div class="tag" style="--i:0">Dildan tilaklar</div>
+  <h2 style="--i:1;margin-bottom:14px">Senga tilayman</h2>
+  <div class="cards">
+    <div class="card" style="--i:0"><span>🌿</span><div><h3>Sog‘lik va xotirjamlik</h3><p>Har kuning yengil, ko‘ngling tinch bo‘lsin.</p></div></div>
+    <div class="card" style="--i:1"><span>✨</span><div><h3>Orzularing ushalsin</h3><p>Niyat qilgan har bir ishing o‘z vaqtida amalga oshsin.</p></div></div>
+    <div class="card" style="--i:2"><span>🤍</span><div><h3>Yaqinlar davrasi</h3><p>Seni qadrlaydigan odamlar doim yoningda bo‘lsin.</p></div></div>
+    <div class="card" style="--i:3"><span>🚀</span><div><h3>Katta yutuqlar</h3><p>O‘qishda, ishda, hayotda — hammasida omad yor bo‘lsin.</p></div></div>
+  </div>
+</section>
+
+<section class="page" id="last">
+  <div class="tag" style="--i:0">Oxirgi sovg‘a</div>
+  <h2 style="--i:1">Shamni o‘chir va<br>tilak ayt 🎂</h2>
+  <svg class="cake" id="cake" style="--i:2" viewBox="0 0 190 170" aria-label="Tort">
+    <g class="flame"><path d="M95 36c-9 12-10 20-4 26 3 3 9 3 12 0 6-6 3-15-8-26z" fill="#ffb347"/><path d="M95 48c-4 6-4 10-1 13 2 1 4 1 5-1 2-3 1-7-4-12z" fill="#fff3b0"/></g>
+    <rect x="91" y="62" width="8" height="30" rx="3" fill="#ff9fb2"/>
+    <rect x="30" y="92" width="130" height="34" rx="10" fill="#f2c98a"/>
+    <path d="M30 104q16 14 32 0t32 0 32 0 32 0v-4H30z" fill="#fff7f0"/>
+    <rect x="18" y="124" width="154" height="36" rx="12" fill="#ff9fb2"/>
+    <path d="M18 138q19 14 38 0t38 0 38 0 40 0v-6H18z" fill="#fff7f0"/>
+  </svg>
+  <div class="hint" style="--i:3" id="hint">Tortga bos 👆</div>
+  <p style="--i:4;margin-top:14px;display:none" id="fin">Tilaging qabul bo‘lsin! Hayotingdagi yangi sahifa baxt va quvonchlarga to‘la bo‘lsin. Bu kun va barcha kunlaring muborak bo‘lsin! 💫</p>
+  <button class="btn" style="--i:5" id="again">Yana bir bor 🎉</button>
+</section>
+
+<div class="swipe" id="sw">suring →</div>
+<div class="nav">
+  <button class="arrow" id="prev" aria-label="Orqaga">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="arrow" id="next" aria-label="Oldinga">→</button>
+</div>
+
+<script>
+// Ism va yosh: havolaga ?ism=Madina&yosh=20 qo‘shish mumkin
+const q=new URLSearchParams(location.search);
+const NAME=q.get('ism')||'', AGE=q.get('yosh')||'20';
+if(NAME)document.getElementById('nm').textContent=NAME;
+document.getElementById('age').textContent=AGE;
+
+const pages=[...document.querySelectorAll('.page')],dots=document.getElementById('dots');
+let cur=0;
+pages.forEach((_,i)=>dots.appendChild(document.createElement('i')));
+function go(n){
+  if(n<0||n>=pages.length)return;
+  pages.forEach((p,i)=>{p.classList.toggle('active',i===n);p.classList.toggle('past',i<n)});
+  [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===n));
+  prev.disabled=n===0;next.disabled=n===pages.length-1;
+  cur=n;document.getElementById('sw').style.display=n?'none':'block';
+  if(n===pages.length-1)burst(.5,.3,60);
+}
+const prev=document.getElementById('prev'),next=document.getElementById('next');
+prev.onclick=()=>go(cur-1);next.onclick=()=>go(cur+1);
+let x0=null;
+addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+addEventListener('touchend',e=>{if(x0===null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>50)go(cur+(d<0?1:-1));x0=null});
+addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+
+// Tort
+const cake=document.getElementById('cake'),last=document.getElementById('last');
+function blow(){
+  if(cake.classList.contains('out'))return;
+  cake.classList.add('out');
+  document.getElementById('hint').style.display='none';
+  document.getElementById('fin').style.display='block';
+  burst(.5,.45,110);petals(45,true);if(navigator.vibrate)navigator.vibrate(60);
+}
+cake.onclick=blow;
+document.getElementById('again').onclick=()=>{burst(.2,.5,70);burst(.8,.5,70);burst(.5,.3,90)};
+
+// Zarrachalar (fon + konfetti)
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+let W,H,dpr=Math.min(devicePixelRatio||1,2),P=[];
+function size(){W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',size);size();
+const cols=['#f2c98a','#ff9fb2','#fff7f0','#c9a7ff','#8fe0c8'];
+for(let i=0;i<14;i++)P.push({t:'s',x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.8,v:Math.random()*.25+.08,a:Math.random()*6.28});
+function petals(n,top){for(let i=0;i<n;i++)P.push({t:'p',x:Math.random()*W,y:top?-Math.random()*H:Math.random()*H,r:Math.random()*5+5,v:Math.random()*.6+.35,a:Math.random()*6.28,rot:Math.random()*6,vr:Math.random()*.03-.015,col:i%3?'#ff9fb2':'#ffd3dc'})}
+petals(16);
+function burst(fx,fy,n){
+  for(let i=0;i<n;i++){const a=Math.random()*6.28,s=Math.random()*7+3;
+    P.push({t:'c',x:fx*W,y:fy*H,vx:Math.cos(a)*s,vy:Math.sin(a)*s-4,w:Math.random()*7+4,h:Math.random()*4+3,rot:Math.random()*6,vr:Math.random()*.3-.15,col:cols[i%cols.length],life:1})}
+}
+function tick(){
+  ctx.clearRect(0,0,W,H);
+  for(let i=P.length-1;i>=0;i--){const p=P[i];
+    if(p.t==='s'){p.y-=p.v;p.a+=.02;if(p.y<-5){p.y=H+5;p.x=Math.random()*W}
+      ctx.globalAlpha=.35+.35*Math.sin(p.a);ctx.fillStyle='#f2c98a';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fill()}
+    else if(p.t==='p'){p.y+=p.v;p.x+=Math.sin(p.a)*.6;p.a+=.015;p.rot+=p.vr;if(p.y>H+20){p.y=-20;p.x=Math.random()*W}ctx.globalAlpha=.75;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.col;ctx.beginPath();ctx.ellipse(0,0,p.r,p.r*.55,0,0,6.28);ctx.fill();ctx.restore()}
+    else{p.vy+=.18;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life-=.007;
+      if(p.life<=0||p.y>H+20){P.splice(i,1);continue}
+      ctx.globalAlpha=Math.min(1,p.life*1.5);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.col;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()}
+  }
+  requestAnimationFrame(tick);
+}
+// Gullar
+(function(){
+let d='<svg width="0" height="0" style="position:absolute"><defs><symbol id="fl" viewBox="-50 -50 100 100">';
+for(let i=0;i<8;i++)d+=`<ellipse cx="0" cy="-27" rx="12" ry="22" fill="currentColor" transform="rotate(${i*45})"/><ellipse cx="0" cy="-27" rx="12" ry="22" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.2" transform="rotate(${i*45})"/>`;
+for(let i=0;i<6;i++)d+=`<ellipse cx="0" cy="-14" rx="7" ry="13" fill="#fff" fill-opacity=".3" transform="rotate(${i*60+20})"/>`;
+d+='<circle r="9" fill="#f7d58a"/><circle r="4" fill="#d9954a"/></symbol><symbol id="lf" viewBox="0 0 40 80"><path d="M20 78C0 52 2 20 20 2c18 18 20 50 0 76z" fill="#5fae8a"/><path d="M20 74V12" stroke="#3b8566" stroke-width="2" fill="none"/></symbol></defs></svg>';
+document.body.insertAdjacentHTML('afterbegin',d);
+const P1=['#ff9fb2','#f2c98a','#fff7f0','#c9a7ff'],P2=['#ffc2d1','#fff7f0','#ff8fa3','#f2c98a'],P3=['#f2c98a','#ff9fb2','#d7c2ff','#fff7f0'];
+const LV=[[95,95,22,-35],[110,70,20,35],[70,115,20,-75],[135,105,18,60],[55,70,18,-120],[100,140,20,-10]];
+const FL=[[70,70,78,0],[135,45,52,1],[40,135,54,2],[120,120,46,3],[160,95,36,0]];
+function cl(pal){let s='<svg viewBox="0 0 200 200">';
+LV.forEach(([x,y,w,a])=>s+=`<use href="#lf" x="${x-w/2}" y="${y-w}" width="${w}" height="${w*2}" transform="rotate(${a} ${x} ${y})"/>`);
+FL.forEach(([x,y,z,c],i)=>s+=`<use href="#fl" x="${x-z/2}" y="${y-z/2}" width="${z}" height="${z}" style="color:${pal[c]}" transform="rotate(${i*23} ${x} ${y})"/>`);
+return s+'</svg>'}
+const D=[
+[['top:-26px;left:-46px;width:200px',P1,'none',0],['bottom:60px;right:-56px;width:210px',P2,'rotate(180deg)',.3]],
+[['top:-26px;right:-46px;width:200px',P2,'scaleX(-1)',0],['bottom:60px;left:-56px;width:210px',P3,'scaleY(-1)',.3]],
+[['top:-40px;left:-50px;width:170px',P3,'none',0],['bottom:70px;right:-50px;width:170px',P1,'rotate(180deg)',.3]],
+[['top:-26px;right:-46px;width:210px',P1,'scaleX(-1)',0],['bottom:60px;left:-50px;width:210px',P3,'scaleY(-1)',.2],['bottom:60px;right:-56px;width:180px',P2,'rotate(180deg)',.5]]
+];
+pages.forEach((p,i)=>(D[i]||[]).forEach(([st,pal,f,dl])=>p.insertAdjacentHTML('afterbegin',`<div class="fl" style="${st};--d:${dl}"><div style="transform:${f}">${cl(pal)}</div></div>`)));
+})();
+tick();go(0);
+</script>
+</body>
+</html>
